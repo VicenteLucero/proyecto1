@@ -26,32 +26,38 @@ def sequences(ind, word, data, comands):
         word2 = data[ind]
 
         if com[0] == 'a':
-            if len(word2) != int(com[1:]):
-                # print('retornado')
-                return
+            if len(word2) == int(com[1:]):
+                frase = frase + ' ' + word2
+                continue
         elif com[0] == 'b':
-            if int(com[1:]) != contar_vocales(word2):
-                # print('retornado')
-                return
+            if int(com[1:]) == contar_vocales(word2):
+                frase = frase + ' ' + word2
+                continue
         elif com == 'c':
-            if contar_vocales(word2) < contar_conso(word2):
-                return
-        elif com == 'c-':
             if contar_vocales(word2) > contar_conso(word2):
-                return
+                frase = frase + ' ' + word2
+                continue
+        elif com == 'c-':
+            if contar_vocales(word2) <= contar_conso(word2):
+                frase = frase + ' ' + word2
+                continue
         elif com == 'd':
-            if word2[0] not in vocales:
-                return
-        elif com == 'd-':
             if word2[0] in vocales:
-                return
+                frase = frase + ' ' + word2
+                continue
+        elif com == 'd-':
+            if word2[0] not in vocales:
+                frase = frase + ' ' + word2
+                continue
         elif com == 'e':
-            if word2[-1] not in vocales:
-                return
-        elif com == 'e-':
             if word2[-1] in vocales:
-                return
-        frase = frase + ' ' + word2
+                frase = frase + ' ' + word2
+                continue
+        elif com == 'e-':
+            if word2[-1] not in vocales:
+                frase = frase + ' ' + word2
+                continue
+        return
         # print(frase)
     frases.append(frase)
 
@@ -73,33 +79,42 @@ for c in comands:
         for i in range(0, len(data)):
             word = data[i]
             if first[0] == 'a':
-                if len(word) != int(first[1:]):
+                if len(word) == int(first[1:]):
+                    sequences(i, word, data, c)
                     continue
             elif first[0] == 'b':
-                if int(first[1:]) != contar_vocales(word):
+                if int(first[1:]) == contar_vocales(word):
+                    sequences(i, word, data, c)
                     continue
             elif first == 'c':
-                if contar_vocales(word) < contar_conso(word):
+                if contar_vocales(word) > contar_conso(word):
+                    sequences(i, word, data, c)
                     continue
             elif first == 'c-':
-                if contar_vocales(word) > contar_conso(word):
+                if contar_vocales(word) <= contar_conso(word):
+                    sequences(i, word, data, c)
                     continue
             elif first == 'd':
-                if word[0] not in vocales:
+                if word[0] in vocales:
+                    sequences(i, word, data, c)
                     continue
             elif first == 'd-':
-                if word[0] in vocales:
+                if word[0] not in vocales:
+                    sequences(i, word, data, c)
                     continue
             elif first == 'e':
-                if word[-1] not in vocales:
+                if word[-1] in vocales:
+                    sequences(i, word, data, c)
                     continue
             elif first == 'e-':
-                if word[-1] in vocales:
+                if word[-1] not in vocales:
+                    sequences(i, word, data, c)
                     continue
-            sequences(i, word, data, c)
+            # print(word)
             # thread = threading.Thread(target=sequences, args=(i, word, data, comands))
             # thread.start()
         #print(len(frases))
         # comands = []
         #print()
 print(len(frases))
+
