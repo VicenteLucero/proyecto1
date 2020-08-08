@@ -117,4 +117,8 @@ for c in comands:
         # comands = []
         #print()
 print(len(frases))
-
+output = open('salida.txt', 'w')
+output.write(str(len(frases))+'\n')
+for f in frases:
+    output.write(f+'\n')
+output.close()
