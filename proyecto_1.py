@@ -1,6 +1,8 @@
 import sys
 import re
-import threading
+import time
+import multiprocessing
+from threading import Thread
 
 
 def contar_vocales(palabra):
@@ -20,7 +22,7 @@ def sequences(ind, word, data, comands):
     for com in comands:
         # print(com)
         # print(com[1:])
-        if ind == len(data)-1:
+        if ind == len(data) - 1:
             return
         ind += 1
         word2 = data[ind]
@@ -61,64 +63,68 @@ def sequences(ind, word, data, comands):
         # print(frase)
     frases.append(frase)
 
-vocales = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U']
-comands = open('comands.txt', 'r').read().split('\n')
-# print(comands)
-text_name = "enwik8.txt"
-text_file = open(text_name, encoding="utf8")
-text = text_file.read()
-text = re.sub(r'[^a-zA-Z \n]', '', text)
-text = re.sub(r'\n', ' ', text)
-data = re.findall(r'[a-zA-Z]+\b', text)
-frases = []
-for c in comands:
-        c = c.split()
-        print(c)
-        first = c.pop(0)
-        # print(first)
-        for i in range(0, len(data)):
-            word = data[i]
-            if first[0] == 'a':
-                if len(word) == int(first[1:]):
-                    sequences(i, word, data, c)
-                    continue
-            elif first[0] == 'b':
-                if int(first[1:]) == contar_vocales(word):
-                    sequences(i, word, data, c)
-                    continue
-            elif first == 'c':
-                if contar_vocales(word) > contar_conso(word):
-                    sequences(i, word, data, c)
-                    continue
-            elif first == 'c-':
-                if contar_vocales(word) <= contar_conso(word):
-                    sequences(i, word, data, c)
-                    continue
-            elif first == 'd':
-                if word[0] in vocales:
-                    sequences(i, word, data, c)
-                    continue
-            elif first == 'd-':
-                if word[0] not in vocales:
-                    sequences(i, word, data, c)
-                    continue
-            elif first == 'e':
-                if word[-1] in vocales:
-                    sequences(i, word, data, c)
-                    continue
-            elif first == 'e-':
-                if word[-1] not in vocales:
-                    sequences(i, word, data, c)
-                    continue
-            # print(word)
-            # thread = threading.Thread(target=sequences, args=(i, word, data, comands))
-            # thread.start()
-        #print(len(frases))
-        # comands = []
-        #print()
-print(len(frases))
-output = open('salida.txt', 'w')
-output.write(str(len(frases))+'\n')
-for f in frases:
-    output.write(f+'\n')
-output.close()
+def ProcessComand(c):
+    c2 = c.split()
+    print(c2)
+    first = c2.pop(0)
+    # print(first)
+    for i in range(0, len(data)):
+        word = data[i]
+        if first[0] == 'a':
+            if len(word) == int(first[1:]):
+                sequences(i, word, data, c2)
+                continue
+        elif first[0] == 'b':
+            if int(first[1:]) == contar_vocales(word):
+                sequences(i, word, data, c2)
+                continue
+        elif first == 'c':
+            if contar_vocales(word) > contar_conso(word):
+                sequences(i, word, data, c2)
+                continue
+        elif first == 'c-':
+            if contar_vocales(word) <= contar_conso(word):
+                sequences(i, word, data, c2)
+                continue
+        elif first == 'd':
+            if word[0] in vocales:
+                sequences(i, word, data, c2)
+                continue
+        elif first == 'd-':
+            if word[0] not in vocales:
+                sequences(i, word, data, c2)
+                continue
+        elif first == 'e':
+            if word[-1] in vocales:
+                sequences(i, word, data, c2)
+                continue
+        elif first == 'e-':
+            if word[-1] not in vocales:
+                sequences(i, word, data, c2)
+                continue
+        # print(word)
+
+if __name__ == '__main__':
+    start = time.perf_counter()
+    vocales = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U']
+    text_name = "enwik8.txt"
+    text_file = open(text_name, encoding="utf8")
+    text = text_file.read()
+    text = re.sub(r'[^a-zA-Z \n]', '', text)
+    text = re.sub(r'\n', ' ', text)
+    data = re.findall(r'[a-zA-Z]+\b', text)
+
+    frases = []
+
+    threads = []
+    comands = open('comands.txt', 'r').read().split('\n')
+    for c in comands:
+        threads.append(Thread(target=ProcessComand(c)))
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+
+    finish = time.perf_counter()
+    print(f'Finished in {round(finish-start, 2)} seconds')
+    print(f'Answer: {len(frases)}')
